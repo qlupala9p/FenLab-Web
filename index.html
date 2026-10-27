@@ -18,6 +18,14 @@
       #unity-canvas { width: 100% !important; height: 100% !important; background: #0f1630; }
       #unity-footer { display: none !important; }
     </style>
+      <style id="fenlab-nav-guard">html, body, #unity-canvas { overscroll-behavior: none; touch-action: none; }</style>
+    <script>
+      /* fenlab-nav-guard */
+      history.pushState({ fenlab: 1 }, '', location.href);
+      window.addEventListener('popstate', function () { history.pushState({ fenlab: 1 }, '', location.href); });
+      window.addEventListener('wheel', function (e) { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) e.preventDefault(); }, { passive: false });
+      window.addEventListener('keydown', function (e) { if (e.key === 'Backspace' && !/input|textarea/i.test((e.target || {}).tagName || '')) e.preventDefault(); });
+    </script>
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
