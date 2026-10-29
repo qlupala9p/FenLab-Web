@@ -51,18 +51,53 @@
         };
       };
     </script>
+      <style id="fenlab-loader">
+      #unity-loading-container { display: block; background: radial-gradient(ellipse at 50% 38%, #26358f 0%, #141c4a 45%, #0a0f26 100%); backdrop-filter: none; overflow: hidden; z-index: 5; }
+      #unity-loading-bar { width: min(440px, 82vw); text-align: center; z-index: 2; }
+      #unity-logo { width: min(260px, 36.5vh, 52vw); height: min(272px, 38vh, 54vw); margin: 0 auto; animation: fenFloat 3.2s ease-in-out infinite; filter: drop-shadow(0 0 28px rgba(53,217,255,.45)); }
+      #unity-progress-bar-empty { width: 100%; height: 16px; margin: 22px 0 0; border-radius: 999px; background: rgba(255,255,255,.12); background-image: none; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,.10); }
+      #unity-progress-bar-full { width: 0%; height: 100%; margin: 0; border-radius: 999px; background: linear-gradient(90deg, #35d9ff, #9a5cf0, #3ed07a, #35d9ff); background-size: 300% 100%; animation: fenShimmer 2.4s linear infinite; transition: width .3s ease-out; box-shadow: 0 0 16px rgba(53,217,255,.7); }
+      #fen-load-pct { margin-top: 12px; font: 700 22px 'Segoe UI', Arial, sans-serif; color: #fff; letter-spacing: .5px; }
+      #fen-load-tip { margin-top: 10px; min-height: 44px; font: 500 16px 'Segoe UI', Arial, sans-serif; color: #b9c6ff; line-height: 1.35; transition: opacity .4s; }
+      .fen-bub { position: absolute; bottom: -60px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), rgba(53,217,255,.18) 60%, rgba(154,92,240,.10)); animation: fenRise linear infinite; z-index: 1; }
+      @keyframes fenFloat { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+      @keyframes fenShimmer { 0% { background-position: 0% 0 } 100% { background-position: 300% 0 } }
+      @keyframes fenRise { 0% { transform: translateY(0) scale(.7); opacity: 0 } 15% { opacity: .9 } 100% { transform: translateY(-115vh) scale(1.1); opacity: 0 } }
+    </style>
+      <script id="fenlab-loader-js">
+      (function () {
+        var tips = ["Hata yapmaktan korkma, sonucunu gör.", "Kimya Laboratuvarı'nda arama çubuğuna beher ya da su yaz.", "Google ile giriş yaparsan ilerlemen buluta kaydedilir.", "Konu Anlatımı'nda sınav tarihlerini ve üniteleri filtreleyebilirsin.", "Soru çöz ve görev yap, XP ile avatarına yeni kıyafetler al.", "Tab tuşu fareyle etrafa bakmayı açıp kapatır.", "İlk açılış birkaç saniye sürebilir, sonraki açılışlar daha hızlıdır."];
+        var tipEl, pctEl, ti = Math.floor(Math.random() * tips.length);
+        function showTip() { if (!tipEl) return; tipEl.style.opacity = 0; setTimeout(function () { tipEl.textContent = tips[ti++ % tips.length]; tipEl.style.opacity = 1; }, 350); }
+        window.fenLoadPct = function (p) { if (pctEl) pctEl.textContent = "%" + Math.round(p * 100); };
+        window.addEventListener("DOMContentLoaded", function () {
+          tipEl = document.getElementById("fen-load-tip"); pctEl = document.getElementById("fen-load-pct");
+          showTip(); setInterval(showTip, 3200);
+          var c = document.getElementById("unity-loading-container");
+          for (var i = 0; i < 14; i++) {
+            var b = document.createElement("div"), sz = 14 + Math.random() * 46; b.className = "fen-bub";
+            b.style.width = b.style.height = sz + "px"; b.style.left = Math.random() * 100 + "%";
+            b.style.animationDuration = (7 + Math.random() * 8) + "s"; b.style.animationDelay = (-Math.random() * 12) + "s";
+            c.appendChild(b);
+          }
+        });
+      })();
+    </script>
   </head>
   <body><div id="fen-rotate"><div>&#x21BB;</div><h2>Telefonu yatay çevir</h2><p>FenLab yatay ekranda çalışır.</p></div>
     <div id="unity-container" class="unity-desktop">
       <div id="unity-fullscreen-container">
         <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
         <div id="unity-loading-container">
-          <div id="unity-loading-bar">
+                    <div id="unity-loading-bar">
             <div id="unity-logo"></div>
             <div id="unity-progress-bar-empty">
               <div id="unity-progress-bar-full"></div>
             </div>
+            <div id="fen-load-pct">FenLab yükleniyor...</div>
+            <div id="fen-load-tip"></div>
           </div>
+        </div>
         </div>
       </div>
       <div id="unity-warning"> </div>
@@ -174,7 +209,7 @@
         createUnityInstance(canvas, config, (progress) => {
           if (progress < 1) {
             loadingContainer.style.display = "block";
-            progressBarFull.style.width = 100 * progress + "%";
+            progressBarFull.style.width = 100 * progress + "%"; if (window.fenLoadPct) fenLoadPct(progress);
           } else {
             loadingContainer.style.display = "none";
           }
