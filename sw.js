@@ -1,8 +1,9 @@
 // FenLab service worker: caches the app after the first visit so it also starts offline.
-const CACHE = 'fenlab-v0.13.0';
+const CACHE = 'fenlab-v0.13.1';
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  // on an upgrade (an older cache exists) reload open tabs once, so nobody keeps seeing the previous version
+  e.waitUntil(caches.keys().then(keys => { const old = keys.filter(k => k !== CACHE); return Promise.all(old.map(k => caches.delete(k))).then(() => old.length > 0); }).then(upgraded => self.clients.claim().then(() => upgraded ? self.clients.matchAll({type: 'window'}).then(cs => cs.forEach(c => c.navigate(c.url).catch(() => {}))) : null)));
 });
 self.addEventListener('fetch', e => {
   const req = e.request;
