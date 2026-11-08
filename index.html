@@ -190,7 +190,7 @@
 
         // To lower canvas resolution on mobile devices to gain some
         // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
+        config.devicePixelRatio = (function () { /* fenlab-dpr-cap */ var d = Math.min(window.devicePixelRatio || 1, 2), a = Math.max(1, window.innerWidth * window.innerHeight); if (a * d * d > 3.2e6) d = Math.sqrt(3.2e6 / a); return Math.max(0.6, d); })();
 
 
       } else {
