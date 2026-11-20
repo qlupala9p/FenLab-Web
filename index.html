@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="tr">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -30,21 +30,98 @@
       window.addEventListener('wheel', function (e) { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) e.preventDefault(); }, { passive: false });
       window.addEventListener('keydown', function (e) { if (e.key === 'Backspace' && !/input|textarea/i.test((e.target || {}).tagName || '')) e.preventDefault(); });
     </script>
-      <style id="fenlab-rotate">#fen-rotate{display:none}@media (orientation:portrait) and (max-width:900px){#fen-rotate{display:flex;position:fixed;inset:0;z-index:99998;background:#0f1630;color:#fff;align-items:center;justify-content:center;flex-direction:column;font-family:sans-serif;text-align:center;padding:30px}#fen-rotate div{font-size:64px;margin-bottom:12px}}</style>
+      <style id="fenlab-shell">
+      :root { --fen-bg: #0f1630; --fen-card: #141c4a; --fen-raised: #1c2660; --fen-tx: #eef1ff; --fen-tx2: #b9c6ff; --fen-mut: #8e9bd6;
+        --fen-line: rgba(238,241,255,.12); --fen-acc: #35d9ff; --fen-go: #188a49; --fen-go-h: #1d9d54; --fen-ease: cubic-bezier(.22,1,.36,1);
+        --fen-font: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif; color-scheme: dark; }
+      ::selection { background: rgba(53,217,255,.35); color: #fff; }
+      .fen-ico { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+      .fen-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 12px; border: 0;
+        font: 600 17px/1 var(--fen-font); color: #fff; background: var(--fen-go); cursor: pointer; text-decoration: none; transition: background-color .15s var(--fen-ease), transform .1s var(--fen-ease); }
+      .fen-btn:hover { background: var(--fen-go-h); } .fen-btn:active { transform: scale(.98); }
+      .fen-btn[disabled] { opacity: .6; cursor: progress; }
+      .fen-btn.alt { background: var(--fen-raised); color: var(--fen-tx); box-shadow: inset 0 0 0 1px var(--fen-line); } .fen-btn.alt:hover { background: #24307a; }
+      .fen-link { background: none; border: 0; padding: 8px; font: 400 15px var(--fen-font); color: var(--fen-tx2); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+      .fen-link:hover { color: var(--fen-tx); }
+      .fen-btn:focus-visible, .fen-link:focus-visible { outline: 2px solid var(--fen-acc); outline-offset: 3px; }
+      .fen-card { width: min(440px, calc(100vw - 32px)); padding: 32px; border-radius: 20px; background: var(--fen-card); border: 1px solid var(--fen-line);
+        box-shadow: 0 24px 64px rgba(0,0,0,.45); color: var(--fen-tx); font-family: var(--fen-font); text-align: center; }
+      .fen-card h2 { margin: 0 0 8px; font: 600 24px/1.25 var(--fen-font); }
+      .fen-card p { margin: 0 0 24px; font-size: 16px; line-height: 1.5; color: var(--fen-tx2); }
+      .fen-card .fen-row { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+      .fen-card .fen-small { margin: 16px 0 0; font-size: 14px; }
+      .fen-card .fen-small a { color: var(--fen-tx2); text-underline-offset: 3px; }
+      .fen-card .fen-detail { margin: 0 0 24px; padding: 12px; border-radius: 10px; background: rgba(0,0,0,.25); font: 13px/1.45 ui-monospace, Consolas, monospace; color: var(--fen-mut); text-align: left; overflow-wrap: anywhere; max-height: 120px; overflow: auto; }
+      .fen-mark { display: grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 14px; background: var(--fen-raised); color: var(--fen-acc); }
+      .fen-mark .fen-ico { width: 24px; height: 24px; }
+      .fen-overlay { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(5,8,25,.78); animation: fenFade .2s var(--fen-ease) both; }
+      .fen-overlay .fen-card { animation: fenRiseIn .25s var(--fen-ease) both; }
+      @keyframes fenFade { from { opacity: 0 } } @keyframes fenRiseIn { from { opacity: 0; transform: translateY(8px) } }
+      #fen-rotate { display: none; }
+      @media (orientation: portrait) and (max-width: 900px) { #fen-rotate { display: flex; position: fixed; inset: 0; z-index: 99998; align-items: center; justify-content: center; padding: 24px; background: var(--fen-bg); } }
+      #fen-error { display: none; } #fen-error.on { display: flex; }
+      #fen-toast { position: fixed; left: 50%; top: 16px; z-index: 99997; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; width: min(520px, calc(100vw - 32px)); pointer-events: none; }
+      #fen-toast div { padding: 12px 16px; border-radius: 12px; background: var(--fen-card); border: 1px solid var(--fen-line); box-shadow: 0 12px 32px rgba(0,0,0,.4); color: var(--fen-tx); font: 15px/1.4 var(--fen-font); animation: fenRiseIn .2s var(--fen-ease) both; }
+      @media (prefers-reduced-motion: reduce) { .fen-overlay, .fen-overlay .fen-card, #fen-toast div { animation: none; } }
+    </style>
+    <script id="fenlab-shell-js">
+      /* fatal errors get a panel with a retry; warnings a short toast. Unity messages are shown as text, never as HTML. */
+      window.fenShowError = function (msg) {
+        var e = document.getElementById('fen-error'); if (!e) { alert(msg); return; }
+        var d = document.getElementById('fen-err-d');
+        if (msg) { d.textContent = String(msg); d.hidden = false; }
+        var lc = document.getElementById('unity-loading-container'); if (lc) lc.style.display = 'none';
+        e.classList.add('on'); document.getElementById('fen-err-retry').focus();
+      };
+      window.fenBanner = function (msg, type) {
+        // Unity also reports non-fatal script errors here while the game keeps running, so these stay a toast;
+        // only a failed start (the createUnityInstance catch) opens the error panel.
+        var t = document.getElementById('fen-toast'); if (!t) return;
+        var div = document.createElement('div'); div.textContent = String(msg).replace(/<[^>]*>/g, ''); t.appendChild(div);
+        setTimeout(function () { div.remove(); }, type === 'error' ? 10000 : 6000);
+      };
+      window.addEventListener('DOMContentLoaded', function () {
+        var r = document.getElementById('fen-err-retry'); if (r) r.onclick = function () { location.reload(); };
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) fenShowError('Bu tarayıcı ya da cihaz WebGL desteklemiyor.');
+      });
+    </script>
       <script type="module" id="fenlab-auth">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
       import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
       const auth = getAuth(initializeApp({ apiKey: "AIzaSyB6QqjuLW1gFZsKtAPVpiX9XAFQXponRE8", authDomain: "fen-lab-a58d7.firebaseapp.com", projectId: "fen-lab-a58d7", storageBucket: "fen-lab-a58d7.firebasestorage.app", messagingSenderId: "36295199033", appId: "1:36295199033:web:01f22d04702dae242cc0e8" }));
       window.__fenAuthResult = "";
-      function done(o) { window.__fenAuthResult = JSON.stringify(o); const d = document.getElementById('fen-auth-ov'); if (d) d.remove(); }
+      let lastFocus = null;
+      function done(o) {
+        window.__fenAuthResult = JSON.stringify(o);
+        const d = document.getElementById('fen-auth-ov'); if (d) d.remove();
+        document.removeEventListener('keydown', onKey, true);
+        const t = document.getElementById('unity-canvas') || lastFocus; if (t && t.focus) t.focus();
+      }
+      function onKey(e) {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); done({ error: 'cancelled' }); return; }
+        if (e.key === 'Tab') { // keep focus inside the dialog
+          const f = Array.from(document.querySelectorAll('#fen-auth-ov button, #fen-auth-ov a')); if (!f.length) return;
+          const i = f.indexOf(document.activeElement), n = e.shiftKey ? (i <= 0 ? f.length - 1 : i - 1) : (i + 1) % f.length;
+          e.preventDefault(); f[n].focus();
+        }
+        e.stopPropagation(); // keys go to the dialog, not to the game behind it
+      }
       window.fenAuthStart = function () {
         if (document.getElementById('fen-auth-ov')) return;
-        const d = document.createElement('div'); d.id = 'fen-auth-ov';
-        d.style.cssText = 'position:fixed;inset:0;background:rgba(5,8,25,.78);display:flex;align-items:center;justify-content:center;z-index:99999;font-family:sans-serif';
-        d.innerHTML = '<div style="background:#12193a;color:#fff;padding:28px 34px;border-radius:24px;max-width:420px;text-align:center;border:2px solid #4b6cff"><h2 style="margin:0 0 8px">FenLab hesabı</h2><p style="opacity:.85;margin:0 0 18px">İlerlemen buluta kaydedilsin diye Google ile giriş yap.</p><button id="fen-go" style="font-size:20px;padding:12px 22px;border:0;border-radius:14px;background:#22a05a;color:#fff;cursor:pointer">Google ile devam et</button><br><button id="fen-no" style="margin-top:14px;background:none;border:0;color:#9db0ff;cursor:pointer;font-size:16px">İptal</button><br><a href="legal.html" target="_blank" style="color:#9db0ff;font-size:14px">Gizlilik ve telif</a></div>';
+        lastFocus = document.activeElement;
+        const d = document.createElement('div'); d.id = 'fen-auth-ov'; d.className = 'fen-overlay';
+        d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'fen-auth-t');
+        d.innerHTML = '<div class="fen-card"><h2 id="fen-auth-t">FenLab hesabı</h2><p>Google ile giriş yaparsan ilerlemen buluta kaydedilir, başka cihazda kaldığın yerden devam edersin.</p>'
+          + '<div class="fen-row"><button class="fen-btn" id="fen-go" type="button">Google ile devam et</button><button class="fen-link" id="fen-no" type="button">Vazgeç</button></div>'
+          + '<p class="fen-small"><a href="legal.html" target="_blank" rel="noopener">Gizlilik ve telif</a></p></div>';
+        d.addEventListener('mousedown', (e) => { if (e.target === d) done({ error: 'cancelled' }); });
         document.body.appendChild(d);
+        document.addEventListener('keydown', onKey, true);
+        const go = document.getElementById('fen-go'); go.focus();
         document.getElementById('fen-no').onclick = () => done({ error: 'cancelled' });
-        document.getElementById('fen-go').onclick = async () => {
+        go.onclick = async () => {
+          go.disabled = true; go.textContent = 'Google penceresi açık...';
           try { const r = await signInWithPopup(auth, new GoogleAuthProvider()); const u = r.user;
             done({ idToken: await u.getIdToken(), refreshToken: u.refreshToken, uid: u.uid, email: u.email || '', name: u.displayName || '' });
           } catch (e) { done({ error: e.code || String(e) }); }
@@ -52,49 +129,48 @@
       };
     </script>
       <style id="fenlab-loader">
-      #unity-loading-container { display: block; background: radial-gradient(ellipse at 50% 38%, #26358f 0%, #141c4a 45%, #0a0f26 100%); backdrop-filter: none; overflow: hidden; z-index: 5; }
-      #unity-loading-bar { width: min(440px, 82vw); text-align: center; z-index: 2; }
-      #unity-logo { width: min(260px, 36.5vh, 52vw); height: min(272px, 38vh, 54vw); margin: 0 auto; animation: fenFloat 3.2s ease-in-out infinite; filter: drop-shadow(0 0 28px rgba(53,217,255,.45)); }
-      #unity-progress-bar-empty { width: 100%; height: 16px; margin: 22px 0 0; border-radius: 999px; background: rgba(255,255,255,.12); background-image: none; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,.10); }
-      #unity-progress-bar-full { width: 0%; height: 100%; margin: 0; border-radius: 999px; background: linear-gradient(90deg, #35d9ff, #9a5cf0, #3ed07a, #35d9ff); background-size: 300% 100%; animation: fenShimmer 2.4s linear infinite; transition: width .3s ease-out; box-shadow: 0 0 16px rgba(53,217,255,.7); }
-      #fen-load-pct { margin-top: 12px; font: 700 22px 'Segoe UI', Arial, sans-serif; color: #fff; letter-spacing: .5px; }
-      #fen-load-tip { margin-top: 10px; min-height: 44px; font: 500 16px 'Segoe UI', Arial, sans-serif; color: #b9c6ff; line-height: 1.35; transition: opacity .4s; }
-      .fen-bub { position: absolute; bottom: -60px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), rgba(53,217,255,.18) 60%, rgba(154,92,240,.10)); animation: fenRise linear infinite; z-index: 1; }
-      @keyframes fenFloat { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
-      @keyframes fenShimmer { 0% { background-position: 0% 0 } 100% { background-position: 300% 0 } }
-      @keyframes fenRise { 0% { transform: translateY(0) scale(.7); opacity: 0 } 15% { opacity: .9 } 100% { transform: translateY(-115vh) scale(1.1); opacity: 0 } }
+      #unity-loading-container { display: block; background: radial-gradient(ellipse at 50% 40%, #1a2560 0%, var(--fen-bg) 70%); overflow: hidden; z-index: 5; }
+      #unity-loading-bar { width: min(400px, 82vw); text-align: center; font-family: var(--fen-font); }
+      #unity-logo { width: min(220px, 32vh, 48vw); height: min(230px, 33vh, 50vw); margin: 0 auto; }
+      #unity-progress-bar-empty { width: 100%; height: 8px; margin: 28px 0 0; border-radius: 4px; background: rgba(238,241,255,.12); background-image: none; overflow: hidden; }
+      /* Unity writes the width; we draw the fill with a transform so the browser never re-lays out while loading */
+      #unity-progress-bar-full { width: 100% !important; height: 100%; margin: 0; border-radius: 4px; background: var(--fen-acc); transform-origin: 0 50%; transform: scaleX(var(--fen-p, 0)); transition: transform .3s var(--fen-ease); }
+      #fen-load-row { display: flex; justify-content: space-between; margin-top: 12px; font-size: 15px; color: var(--fen-tx2); }
+      #fen-load-pct { font-variant-numeric: tabular-nums; color: var(--fen-tx); }
+      #fen-load-tip { margin-top: 24px; min-height: 48px; font-size: 16px; line-height: 1.5; color: var(--fen-tx2); transition: opacity .35s var(--fen-ease); }
+      @media (prefers-reduced-motion: reduce) { #unity-progress-bar-full, #fen-load-tip { transition: none; } }
     </style>
       <script id="fenlab-loader-js">
       (function () {
         var tips = ["Hata yapmaktan korkma, sonucunu gör.", "Kimya Laboratuvarı'nda arama çubuğuna beher ya da su yaz.", "Google ile giriş yaparsan ilerlemen buluta kaydedilir.", "Konu Anlatımı'nda sınav tarihlerini ve üniteleri filtreleyebilirsin.", "Soru çöz ve görev yap, XP ile avatarına yeni kıyafetler al.", "Tab tuşu fareyle etrafa bakmayı açıp kapatır.", "İlk açılış birkaç saniye sürebilir, sonraki açılışlar daha hızlıdır."];
-        var tipEl, pctEl, ti = Math.floor(Math.random() * tips.length);
+        var tipEl, pctEl, bar, fill, ti = Math.floor(Math.random() * tips.length);
         function showTip() { if (!tipEl) return; tipEl.style.opacity = 0; setTimeout(function () { tipEl.textContent = tips[ti++ % tips.length]; tipEl.style.opacity = 1; }, 350); }
-        window.fenLoadPct = function (p) { if (pctEl) pctEl.textContent = "%" + Math.round(p * 100); };
+        window.fenLoadPct = function (p) {
+          var n = Math.round(p * 100);
+          if (pctEl) pctEl.textContent = "%" + n;
+          if (bar) bar.setAttribute("aria-valuenow", n);
+          if (fill) fill.style.setProperty("--fen-p", p);
+        };
         window.addEventListener("DOMContentLoaded", function () {
           tipEl = document.getElementById("fen-load-tip"); pctEl = document.getElementById("fen-load-pct");
-          showTip(); setInterval(showTip, 3200);
-          var c = document.getElementById("unity-loading-container");
-          for (var i = 0; i < 14; i++) {
-            var b = document.createElement("div"), sz = 14 + Math.random() * 46; b.className = "fen-bub";
-            b.style.width = b.style.height = sz + "px"; b.style.left = Math.random() * 100 + "%";
-            b.style.animationDuration = (7 + Math.random() * 8) + "s"; b.style.animationDelay = (-Math.random() * 12) + "s";
-            c.appendChild(b);
-          }
+          bar = document.getElementById("unity-progress-bar-empty"); fill = document.getElementById("unity-progress-bar-full");
+          showTip(); setInterval(showTip, 5500); // long enough to read a whole tip
         });
       })();
     </script>
   </head>
-  <body><div id="fen-rotate"><div>&#x21BB;</div><h2>Telefonu yatay çevir</h2><p>FenLab yatay ekranda çalışır.</p></div>
+  <body><div id="fen-rotate" role="alert"><div class="fen-card"><span class="fen-mark" aria-hidden="true"><svg class="fen-ico" viewBox="0 0 24 24"><rect width="12" height="18" x="3" y="3" rx="2"/><path d="M21 15a6 6 0 0 1-6 6"/><path d="m17 17-2 4 4 1"/></svg></span><h2>Telefonu yatay çevir</h2><p style="margin:0">FenLab yatay ekranda çalışır. Ekran döndürme kilidi açıksa kapat.</p>
+</div></div><!--/fen-rotate--><div id="fen-error" class="fen-overlay" role="alertdialog" aria-modal="true" aria-labelledby="fen-err-t" aria-describedby="fen-err-p"><div class="fen-card"><span class="fen-mark" aria-hidden="true"><svg class="fen-ico" viewBox="0 0 24 24"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/><path d="M8.5 2h7"/><path d="M12 13v3"/><path d="M12 19h.01"/></svg></span><h2 id="fen-err-t">FenLab açılamadı</h2><p id="fen-err-p">Sayfayı yenilemeyi dene. Sorun sürerse Chrome ya da Edge'in güncel sürümünü kullan ve tarayıcı ayarlarında donanım hızlandırmayı aç.</p><div class="fen-detail" id="fen-err-d" hidden></div><div class="fen-row"><button class="fen-btn" id="fen-err-retry" type="button">Yeniden dene</button><a class="fen-link" href="https://github.com/qlupala9p/FenLab-Web/issues" target="_blank" rel="noopener">Hata bildir</a></div></div></div><!--/fen-error--><div id="fen-toast" role="status" aria-live="polite"></div><div id="fen-toast" role="status" aria-live="polite"></div>
     <div id="unity-container" class="unity-desktop">
       <div id="unity-fullscreen-container">
         <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
         <div id="unity-loading-container">
-                    <div id="unity-loading-bar">
-            <div id="unity-logo"></div>
-            <div id="unity-progress-bar-empty">
+                                        <div id="unity-loading-bar">
+            <div id="unity-logo" role="img" aria-label="FenLab"></div>
+            <div id="unity-progress-bar-empty" role="progressbar" aria-label="FenLab yükleniyor" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
               <div id="unity-progress-bar-full"></div>
             </div>
-            <div id="fen-load-pct">FenLab yükleniyor...</div>
+            <div id="fen-load-row"><span>Yükleniyor</span><span id="fen-load-pct">%0</span></div>
             <div id="fen-load-tip"></div>
           </div>
         </div>
@@ -153,7 +229,7 @@
         companyName: "FenLab",
         productName: "FenLab",
         productVersion: "1.0",
-        showBanner: unityShowBanner,
+        showBanner: fenBanner,
         // errorHandler: function(err, url, line) {
         //    alert("error " + err + " occurred at line " + line);
         //    // Return 'true' if you handled this error and don't want Unity
@@ -190,7 +266,7 @@
 
         // To lower canvas resolution on mobile devices to gain some
         // performance, uncomment the following line:
-        config.devicePixelRatio = (function () { /* fenlab-dpr-cap */ var d = Math.min(window.devicePixelRatio || 1, 2), a = Math.max(1, window.innerWidth * window.innerHeight); if (a * d * d > 3.2e6) d = Math.sqrt(3.2e6 / a); return Math.max(0.6, d); })();
+        // config.devicePixelRatio = 1;
 
 
       } else {
@@ -200,6 +276,7 @@
       }
 
 
+      config.devicePixelRatio = (function () { /* fenlab-dpr-cap2 */ var d = Math.min(window.devicePixelRatio || 1, 2), a = Math.max(1, window.innerWidth * window.innerHeight); if (a * d * d > 3.2e6) d = Math.sqrt(3.2e6 / a); return Math.max(0.6, d); })();
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
@@ -209,7 +286,7 @@
         createUnityInstance(canvas, config, (progress) => {
           if (progress < 1) {
             loadingContainer.style.display = "block";
-            progressBarFull.style.width = 100 * progress + "%"; if (window.fenLoadPct) fenLoadPct(progress);
+            progressBarFull.style.width = 100 * progress + "%"; if (window.fenLoadPct) fenLoadPct(progress); if (window.fenLoadPct) fenLoadPct(progress); if (window.fenLoadPct) fenLoadPct(progress);
           } else {
             loadingContainer.style.display = "none";
           }
@@ -219,7 +296,7 @@
                 };
 
               }).catch((message) => {
-                alert(message);
+                fenShowError(message);
               });
             };
 
@@ -234,7 +311,7 @@
           navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister()));
           if (window.caches) caches.keys().then(ks => ks.forEach(k => caches.delete(k)));
         } else {
-          window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+          window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
         }
       }
     </script>
