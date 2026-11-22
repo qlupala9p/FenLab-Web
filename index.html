@@ -160,12 +160,12 @@
     </script>
   </head>
   <body><div id="fen-rotate" role="alert"><div class="fen-card"><span class="fen-mark" aria-hidden="true"><svg class="fen-ico" viewBox="0 0 24 24"><rect width="12" height="18" x="3" y="3" rx="2"/><path d="M21 15a6 6 0 0 1-6 6"/><path d="m17 17-2 4 4 1"/></svg></span><h2>Telefonu yatay çevir</h2><p style="margin:0">FenLab yatay ekranda çalışır. Ekran döndürme kilidi açıksa kapat.</p>
-</div></div><!--/fen-rotate--><div id="fen-error" class="fen-overlay" role="alertdialog" aria-modal="true" aria-labelledby="fen-err-t" aria-describedby="fen-err-p"><div class="fen-card"><span class="fen-mark" aria-hidden="true"><svg class="fen-ico" viewBox="0 0 24 24"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/><path d="M8.5 2h7"/><path d="M12 13v3"/><path d="M12 19h.01"/></svg></span><h2 id="fen-err-t">FenLab açılamadı</h2><p id="fen-err-p">Sayfayı yenilemeyi dene. Sorun sürerse Chrome ya da Edge'in güncel sürümünü kullan ve tarayıcı ayarlarında donanım hızlandırmayı aç.</p><div class="fen-detail" id="fen-err-d" hidden></div><div class="fen-row"><button class="fen-btn" id="fen-err-retry" type="button">Yeniden dene</button><a class="fen-link" href="https://github.com/qlupala9p/FenLab-Web/issues" target="_blank" rel="noopener">Hata bildir</a></div></div></div><!--/fen-error--><div id="fen-toast" role="status" aria-live="polite"></div><div id="fen-toast" role="status" aria-live="polite"></div>
+</div></div><!--/fen-rotate--><div id="fen-error" class="fen-overlay" role="alertdialog" aria-modal="true" aria-labelledby="fen-err-t" aria-describedby="fen-err-p"><div class="fen-card"><span class="fen-mark" aria-hidden="true"><svg class="fen-ico" viewBox="0 0 24 24"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/><path d="M8.5 2h7"/><path d="M12 13v3"/><path d="M12 19h.01"/></svg></span><h2 id="fen-err-t">FenLab açılamadı</h2><p id="fen-err-p">Sayfayı yenilemeyi dene. Sorun sürerse Chrome ya da Edge'in güncel sürümünü kullan ve tarayıcı ayarlarında donanım hızlandırmayı aç.</p><div class="fen-detail" id="fen-err-d" hidden></div><div class="fen-row"><button class="fen-btn" id="fen-err-retry" type="button">Yeniden dene</button><a class="fen-link" href="https://github.com/qlupala9p/FenLab-Web/issues" target="_blank" rel="noopener">Hata bildir</a></div></div></div><!--/fen-error--><div id="fen-toast" role="status" aria-live="polite"></div>
     <div id="unity-container" class="unity-desktop">
       <div id="unity-fullscreen-container">
         <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
         <div id="unity-loading-container">
-                                        <div id="unity-loading-bar">
+                    <div id="unity-loading-bar">
             <div id="unity-logo" role="img" aria-label="FenLab"></div>
             <div id="unity-progress-bar-empty" role="progressbar" aria-label="FenLab yükleniyor" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
               <div id="unity-progress-bar-full"></div>
@@ -173,7 +173,6 @@
             <div id="fen-load-row"><span>Yükleniyor</span><span id="fen-load-pct">%0</span></div>
             <div id="fen-load-tip"></div>
           </div>
-        </div>
         </div>
       </div>
       <div id="unity-warning"> </div>
@@ -286,7 +285,7 @@
         createUnityInstance(canvas, config, (progress) => {
           if (progress < 1) {
             loadingContainer.style.display = "block";
-            progressBarFull.style.width = 100 * progress + "%"; if (window.fenLoadPct) fenLoadPct(progress); if (window.fenLoadPct) fenLoadPct(progress); if (window.fenLoadPct) fenLoadPct(progress);
+            progressBarFull.style.width = 100 * progress + "%"; if (window.fenLoadPct) fenLoadPct(progress);
           } else {
             loadingContainer.style.display = "none";
           }
